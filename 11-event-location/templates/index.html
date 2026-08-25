@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS Logger</title>
+</head>
+<body>
+
+<h2>Actual GPS Location</h2>
+
+<button onclick="getLocation()">Get Location</button>
+
+<p id="result"></p>
+
+<script>
+function getLocation(){
+
+    if(!navigator.geolocation){
+        document.getElementById("result").innerText="GPS not supported";
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        sendLocation,
+        showError
+    );
+}
+
+function sendLocation(position){
+
+    const latitude=position.coords.latitude;
+    const longitude=position.coords.longitude;
+
+    document.getElementById("result").innerText=
+        "Latitude: "+latitude+
+        "\nLongitude: "+longitude;
+
+    fetch("/location",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            latitude:latitude,
+            longitude:longitude
+        })
+    });
+}
+
+function showError(error){
+    document.getElementById("result").innerText=
+        "Location permission/error: "+error.message;
+}
+</script>
+
+</body>
+</html>
