@@ -18,6 +18,8 @@ func main(){
 
     defer conn.Close()
 
+    go receiveMessages(conn)
+
     reader:=bufio.NewReader(os.Stdin)
 
     for{
@@ -26,22 +28,23 @@ func main(){
 
         message,_:=reader.ReadString('\n')
 
-        _,err:=conn.Write([]byte(message))
+        conn.Write([]byte(message))
+    }
+}
 
-        if err!=nil{
-            fmt.Println("Error:",err)
-            return
-        }
+func receiveMessages(conn net.Conn){
 
-        buffer:=make([]byte,1024)
+    buffer:=make([]byte,1024)
+
+    for{
 
         n,err:=conn.Read(buffer)
 
         if err!=nil{
-            fmt.Println("Error:",err)
             return
         }
 
-        fmt.Println("Server:",string(buffer[:n]))
+        fmt.Println("\nServer:",string(buffer[:n]))
+        fmt.Print("Enter message: ")
     }
 }
